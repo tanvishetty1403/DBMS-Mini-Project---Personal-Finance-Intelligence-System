@@ -58,7 +58,7 @@ def proc_rows(name, args):
 
 
 def categories():
-    return query("SELECT category_id, name FROM Category WHERE category_type<>'transfer' ORDER BY name")
+    return query("SELECT category_id, name FROM Category WHERE category_type='expense' ORDER BY name")
 
 
 # ---------- dashboard ----------
