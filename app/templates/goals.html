@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Goals</h1>
+
+<div class="card">
+  <form class="row" method="post">
+    <label>Goal<input name="goal_name" placeholder="Laptop" required></label>
+    <label>Target amount<input type="number" name="target_amount" min="1" step="0.01" required></label>
+    <label>Already saved<input type="number" name="current_amount" min="0" step="0.01"></label>
+    <label>Deadline<input type="date" name="deadline"></label>
+    <button>Add goal</button>
+  </form>
+</div>
+
+<div class="grid">
+  {% for g in goals %}
+  <div class="card">
+    <div style="display:flex;justify-content:space-between">
+      <b>{{ g.goal_name }}{% if g.status == 'COMPLETED' %} ✅{% endif %}</b>
+      <span class="mut">{{ g.status.replace('_', ' ') }}</span>
+    </div>
+    <div class="bar"><i class="{{ 'ok' if g.status == 'COMPLETED' else '' }}" style="width:{{ g.progress_pct|float }}%"></i></div>
+    <div>{{ g.current_amount|inr }} of {{ g.target_amount|inr }} <span class="mut">({{ g.progress_pct }}%)</span></div>
+    <div class="mut">
+      {% if g.deadline %}Deadline: {{ g.deadline }}{% else %}No deadline{% endif %}
+      {% if g.completed_on %} · Completed on {{ g.completed_on }}{% endif %}
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      {% if g.status == 'IN_PROGRESS' %}
+      <form class="row" method="post" action="{{ url_for('maansi.goal_contribute', gid=g.goal_id) }}" style="gap:6px">
+        <input type="number" name="amount" min="1" step="0.01" placeholder="Amount" style="width:100px" required>
+        <button>Add money</button></form>
+      <form method="post" action="{{ url_for('maansi.goal_cancel', gid=g.goal_id) }}"><button class="link">Cancel goal</button></form>
+      {% endif %}
+      <form method="post" action="{{ url_for('maansi.goal_delete', gid=g.goal_id) }}"
+            onsubmit="return confirm('Delete this goal?')"><button class="link">Delete</button></form>
+    </div>
+  </div>
+  {% else %}<p class="mut">No goals yet.</p>{% endfor %}
+</div>
+{% endblock %}

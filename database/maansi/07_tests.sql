@@ -11,7 +11,7 @@ SELECT asset_name, fn_investment_pnl(investment_id) AS pnl FROM Investment;
 -- procedures
 CALL sp_monthly_budget_report(1, CURDATE());
 CALL sp_portfolio_summary(1);
-CALL sp_process_due_subscriptions();      -- Netflix is overdue, so it is charged once
+CALL sp_process_due_subscriptions(NULL);      -- Netflix is overdue, so it is charged once
 SELECT subscription_id, name, last_paid_date, next_payment_date FROM Subscription;
 
 -- trigger: goal completion

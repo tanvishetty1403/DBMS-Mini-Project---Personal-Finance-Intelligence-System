@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Investments</h1>
+
+{% if total %}
+<div class="grid">
+  <div class="card"><div class="mut">Invested</div><div class="stat">{{ total.invested|inr }}</div></div>
+  <div class="card"><div class="mut">Current value</div><div class="stat">{{ total.current_value|inr }}</div></div>
+  <div class="card"><div class="mut">Profit / loss</div>
+    <div class="stat {{ 'in' if total.profit_loss >= 0 else 'out' }}">{{ total.profit_loss|inr }}
+      <span class="mut" style="font-size:14px">({{ total.pnl_pct }}%)</span></div></div>
+</div>
+{% endif %}
+
+{% if by_type %}
+<div class="card">
+  <b>Portfolio by asset type</b>
+  <table>
+    <tr><th>Type</th><th class="right">Holdings</th><th class="right">Invested</th><th class="right">Current</th>
+        <th class="right">P&amp;L</th><th class="right">%</th></tr>
+    {% for s in by_type %}
+    <tr><td>{{ s.asset_type }}</td><td class="right">{{ s.holdings }}</td>
+        <td class="right">{{ s.invested|inr }}</td><td class="right">{{ s.current_value|inr }}</td>
+        <td class="right {{ 'in' if s.profit_loss >= 0 else 'out' }}">{{ s.profit_loss|inr }}</td>
+        <td class="right {{ 'in' if s.pnl_pct >= 0 else 'out' }}">{{ s.pnl_pct }}%</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+<div class="card">
+  <form class="row" method="post">
+    <label>Asset name<input name="asset_name" required></label>
+    <label>Type<select name="asset_type">{% for t in types %}<option>{{ t }}</option>{% endfor %}</select></label>
+    <label>Quantity<input type="number" name="quantity" min="0.0001" step="any" required></label>
+    <label>Buy price<input type="number" name="buy_price" min="0" step="0.01" required></label>
+    <label>Current price<input type="number" name="current_price" min="0" step="0.01"></label>
+    <label>Purchase date<input type="date" name="purchase_date" value="{{ today }}" required></label>
+    <button>Add</button>
+  </form>
+</div>
+
+<div class="card">
+  <b>Holdings</b>
+  <table>
+    <tr><th>Asset</th><th>Type</th><th class="right">Qty</th><th class="right">Buy</th><th class="right">Now</th>
+        <th class="right">Invested</th><th class="right">Value</th><th class="right">P&amp;L</th><th></th></tr>
+    {% for i in rows %}
+    <tr>
+      <td>{{ i.asset_name }}</td><td>{{ i.asset_type }}</td><td class="right">{{ i.quantity }}</td>
+      <td class="right">{{ i.buy_price|inr }}</td><td class="right">{{ i.current_price|inr }}</td>
+      <td class="right">{{ i.invested|inr }}</td><td class="right">{{ i.current_value|inr }}</td>
+      <td class="right {{ 'in' if i.pnl >= 0 else 'out' }}">{{ i.pnl|inr }} <span class="mut">({{ i.pnl_pct }}%)</span></td>
+      <td class="right">
+        <form class="row" method="post" action="{{ url_for('maansi.investment_price', iid=i.investment_id) }}" style="display:inline-flex;gap:4px">
+          <input type="number" name="current_price" value="{{ i.current_price }}" min="0" step="0.01" style="width:100px">
+          <button>Update</button></form>
+        <form method="post" action="{{ url_for('maansi.investment_delete', iid=i.investment_id) }}" style="display:inline"
+              onsubmit="return confirm('Delete {{ i.asset_name }}?')"><button class="link">Delete</button></form>
+      </td>
+    </tr>
+    {% else %}<tr><td colspan="9" class="mut">No investments yet.</td></tr>{% endfor %}
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Budgets</h1>
+
+{% for a in alerts %}
+<div class="flash error">⚠️ {{ a.message }}
+  <form method="post" action="{{ url_for('maansi.alert_read', aid=a.alert_id) }}" style="display:inline">
+    <button class="link">Dismiss</button></form>
+</div>
+{% endfor %}
+
+<div class="card">
+  <form class="row" method="get">
+    <label>Month<input type="month" name="month" value="{{ month }}"></label>
+    <button>Show</button>
+  </form>
+</div>
+
+<div class="card">
+  <form class="row" method="post">
+    <label>Category
+      <select name="category_id" required>
+        <option value="">Choose…</option>
+        {% for c in categories %}<option value="{{ c.category_id }}">{{ c.name }}</option>{% endfor %}
+      </select></label>
+    <label>Monthly limit<input type="number" name="limit_amount" min="1" step="0.01" required></label>
+    <input type="hidden" name="month" value="{{ month }}">
+    <button>Add budget</button>
+  </form>
+</div>
+
+<div class="card">
+  <table>
+    <tr><th>Category</th><th class="right">Limit</th><th class="right">Spent</th><th class="right">Remaining</th>
+        <th style="width:150px">Used</th><th>Status</th><th></th></tr>
+    {% for r in rows %}
+    <tr>
+      <td>{{ r.category }}</td>
+      <td class="right">{{ r.limit_amount|inr }}</td>
+      <td class="right">{{ r.spent|inr }}</td>
+      <td class="right {{ 'out' if r.remaining < 0 }}">{{ r.remaining|inr }}</td>
+      <td><div class="bar"><i class="{{ r.status|lower }}" style="width:{{ [r.utilisation_pct|float, 100]|min }}%"></i></div>
+          <span class="mut">{{ r.utilisation_pct }}%</span></td>
+      <td>{{ r.status }}</td>
+      <td class="right">
+        <form class="row" method="post" action="{{ url_for('maansi.budget_limit', bid=r.budget_id) }}" style="display:inline-flex;gap:4px">
+          <input type="number" name="limit_amount" value="{{ r.limit_amount }}" min="1" step="0.01" style="width:90px">
+          <button>Save</button></form>
+        <form method="post" action="{{ url_for('maansi.budget_delete', bid=r.budget_id) }}" style="display:inline"
+              onsubmit="return confirm('Delete this budget?')"><button class="link">Delete</button></form>
+      </td>
+    </tr>
+    {% else %}<tr><td colspan="7" class="mut">No budgets for this month.</td></tr>{% endfor %}
+  </table>
+</div>
+{% endblock %}

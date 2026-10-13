@@ -28,7 +28,7 @@ BEGIN
   GROUP BY asset_type WITH ROLLUP;   -- NULL asset_type row = grand total
 END$$
 
-CREATE PROCEDURE sp_process_due_subscriptions()
+CREATE PROCEDURE sp_process_due_subscriptions(IN p_user INT)   -- p_user NULL = everyone
 BEGIN
   DECLARE done INT DEFAULT 0;
   DECLARE v_id, v_acc, v_cat INT;
@@ -41,7 +41,8 @@ BEGIN
   DECLARE cur CURSOR FOR
     SELECT subscription_id, account_id, category_id, name, amount
     FROM Subscription
-    WHERE status = 'ACTIVE' AND next_payment_date <= CURDATE();
+    WHERE status = 'ACTIVE' AND next_payment_date <= CURDATE()
+      AND (p_user IS NULL OR user_id = p_user);
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
   OPEN cur;

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Dashboard</h1>
+{% if d.alerts %}
+<div class="flash error">You have {{ d.alerts }} unread budget alert(s). <a href="{{ url_for('maansi.budgets') }}">View them</a></div>
+{% endif %}
+
+<div class="grid">
+  <div class="card"><div class="mut">Net worth</div><div class="stat">{{ d.nw.net_worth|inr }}</div></div>
+  <div class="card"><div class="mut">Cash in accounts</div><div class="stat">{{ d.nw.cash_balance|inr }}</div></div>
+  <div class="card"><div class="mut">Investments (current value)</div><div class="stat">{{ d.nw.investment_value|inr }}</div></div>
+  <div class="card"><div class="mut">Portfolio profit / loss</div>
+    <div class="stat {{ 'in' if d.pnl >= 0 else 'out' }}">{{ d.pnl|inr }}</div></div>
+  <div class="card"><div class="mut">Subscriptions per month</div><div class="stat">{{ d.sub_monthly|inr }}</div></div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <b>Budgets this month</b>
+    {% for b in d.budgets %}
+      <div style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between"><span>{{ b.category }}</span>
+          <span class="mut">{{ b.spent|inr }} / {{ b.limit_amount|inr }}</span></div>
+        <div class="bar"><i class="{{ 'exceeded' if b.utilisation_pct > 100 else 'warning' if b.utilisation_pct >= 80 else 'ok' }}"
+             style="width:{{ [b.utilisation_pct|float, 100]|min }}%"></i></div>
+      </div>
+    {% else %}<p class="mut">No budgets set. <a href="{{ url_for('maansi.budgets') }}">Add one</a></p>{% endfor %}
+  </div>
+
+  <div class="card">
+    <b>Goals</b>
+    {% for g in d.goals %}
+      <div style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between"><span>{{ g.goal_name }}{% if g.status == 'COMPLETED' %} ✅{% endif %}</span>
+          <span class="mut">{{ g.progress_pct }}%</span></div>
+        <div class="bar"><i class="{{ 'ok' if g.status == 'COMPLETED' else '' }}" style="width:{{ g.progress_pct|float }}%"></i></div>
+      </div>
+    {% else %}<p class="mut">No goals yet. <a href="{{ url_for('maansi.goals') }}">Add one</a></p>{% endfor %}
+  </div>
+
+  <div class="card">
+    <b>Upcoming payments</b>
+    <table>
+      {% for s in d.upcoming %}
+      <tr><td>{{ s.name }}</td><td class="right">{{ s.amount|inr }}</td><td class="right mut">{{ s.next_payment_date }}</td></tr>
+      {% else %}<tr><td class="mut">No active subscriptions</td></tr>{% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}

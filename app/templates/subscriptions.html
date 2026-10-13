@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Subscriptions</h1>
+
+<div class="grid">
+  <div class="card"><div class="mut">Active subscriptions</div><div class="stat">{{ summary.n }}</div></div>
+  <div class="card"><div class="mut">Cost per month</div><div class="stat">{{ summary.monthly|inr }}</div></div>
+  <div class="card"><div class="mut">Cost per year</div><div class="stat">{{ summary.yearly|inr }}</div></div>
+</div>
+
+<div class="card">
+  <form class="row" method="post">
+    <label>Name<input name="name" placeholder="Netflix" required></label>
+    <label>Amount<input type="number" name="amount" min="1" step="0.01" required></label>
+    <label>Billing cycle
+      <select name="billing_cycle"><option>WEEKLY</option><option selected>MONTHLY</option><option>YEARLY</option></select></label>
+    <label>Next payment<input type="date" name="next_payment_date" value="{{ today }}" required></label>
+    <label>Pay from
+      <select name="account_id" required>
+        <option value="">Choose…</option>
+        {% for a in accounts %}<option value="{{ a.account_id }}">{{ a.account_name }}</option>{% endfor %}
+      </select></label>
+    <label>Category
+      <select name="category_id"><option value="">(none)</option>
+        {% for c in categories %}<option value="{{ c.category_id }}">{{ c.name }}</option>{% endfor %}
+      </select></label>
+    <button>Add</button>
+  </form>
+</div>
+
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <b>All subscriptions</b>
+    <form method="post" action="{{ url_for('maansi.subscriptions_process') }}">
+      <button>Process due payments</button></form>
+  </div>
+  <table>
+    <tr><th>Name</th><th class="right">Amount</th><th>Cycle</th><th class="right">Per month</th>
+        <th>Next payment</th><th>Last paid</th><th>Status</th><th></th></tr>
+    {% for s in subs %}
+    <tr>
+      <td>{{ s.name }}</td>
+      <td class="right">{{ s.amount|inr }}</td>
+      <td>{{ s.billing_cycle }}</td>
+      <td class="right">{{ s.monthly_cost|inr }}</td>
+      <td>{{ s.next_payment_date }}</td>
+      <td>{{ s.last_paid_date or '-' }}</td>
+      <td class="{{ 'in' if s.status == 'ACTIVE' else 'mut' }}">{{ s.status }}</td>
+      <td class="right">
+        <form method="post" action="{{ url_for('maansi.subscription_status', sid=s.subscription_id) }}" style="display:inline">
+          {% if s.status == 'ACTIVE' %}<input type="hidden" name="status" value="PAUSED"><button class="link">Pause</button>
+          {% else %}<input type="hidden" name="status" value="ACTIVE"><button class="link">Activate</button>{% endif %}
+        </form>
+        <form method="post" action="{{ url_for('maansi.subscription_delete', sid=s.subscription_id) }}" style="display:inline"
+              onsubmit="return confirm('Delete {{ s.name }}?')"><button class="link">Delete</button></form>
+      </td>
+    </tr>
+    {% else %}<tr><td colspan="8" class="mut">No subscriptions yet.</td></tr>{% endfor %}
+  </table>
+</div>
+{% endblock %}
