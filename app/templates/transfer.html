@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block body %}
+<h1>Transfer between accounts</h1>
+<div class="card"><form class="row" method="post">
+<label>From<select name="from_account">{% for a in accounts %}<option value="{{ a.account_id }}">{{ a.account_name }} (₹{{ '{:,.2f}'.format(a.balance) }})</option>{% endfor %}</select></label>
+<label>To<select name="to_account">{% for a in accounts %}<option value="{{ a.account_id }}">{{ a.account_name }}</option>{% endfor %}</select></label>
+<label>Amount<input name="amount" type="number" step="0.01" min="0.01" required></label>
+<label>Date<input name="transfer_date" type="date" value="{{ today }}" required></label>
+<label>Note<input name="description"></label>
+<button>Transfer</button></form>
+<p class="mut">Both legs are applied together. If either fails (e.g. insufficient balance), nothing changes.</p></div>
+{% endblock %}

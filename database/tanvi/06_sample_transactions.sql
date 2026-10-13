@@ -1,0 +1,36 @@
+USE personal_finance;
+-- run AFTER triggers are created: each insert fires trg_txn_before_insert / trg_txn_after_insert
+INSERT INTO Transaction (account_id, category_id, merchant_id, amount, txn_type, txn_date, description) VALUES
+(1, 10, NULL, 60000.00,'income', '2026-08-01','August stipend'),
+(1, 5, NULL, 15000.00,'expense','2026-08-02','PG rent'),
+(1, 1, 1,      450.00,'expense','2026-08-04','Swiggy dinner'),
+(1, 3, 3,     1800.00,'expense','2026-08-06','Weekly groceries'),
+(1, 4, 4,      320.00,'expense','2026-08-08','Uber to campus'),
+(1, 2, 7,      649.00,'expense','2026-08-10','Netflix'),
+(1, 7, 9,     1250.00,'expense','2026-08-12','Electricity bill'),
+(1, 1, 2,      380.00,'expense','2026-08-15','Zomato lunch'),
+(1, 6, 6,     2299.00,'expense','2026-08-18','Headphones'),
+(1, 8,NULL,  4500.00,'expense','2026-08-20','Course fee'),
+(1, 10, NULL, 60000.00,'income', '2026-09-01','September stipend'),
+(1, 5, NULL, 15000.00,'expense','2026-09-02','PG rent'),
+(1, 1, 1,      520.00,'expense','2026-09-05','Swiggy'),
+(1, 3, 3,     2100.00,'expense','2026-09-07','Groceries'),
+(1, 4, 5,      120.00,'expense','2026-09-09','Metro card top-up'),
+(1, 2, 8,      119.00,'expense','2026-09-10','Spotify'),
+(1, 1, 2,      610.00,'expense','2026-09-14','Zomato'),
+(1, 9,10,     780.00,'expense','2026-09-16','Pharmacy'),
+(1, 11, NULL,  8000.00,'income', '2026-09-20','Freelance project'),
+(1, 4, 4,      410.00,'expense','2026-09-22','Uber'),
+(4, 10, NULL, 45000.00,'income', '2026-09-01','September salary'),
+(4, 5, NULL, 12000.00,'expense','2026-09-03','Rent'),
+(4, 1, 2,      540.00,'expense','2026-09-06','Zomato'),
+(4, 3, 3,     1900.00,'expense','2026-09-08','BigBasket'),
+(4, 6, 6,     1599.00,'expense','2026-09-12','Amazon order'),
+(4, 4, 4,      280.00,'expense','2026-09-15','Uber'),
+(4, 2, 7,      649.00,'expense','2026-09-18','Netflix'),
+(4, 7, 9,     1100.00,'expense','2026-09-21','BESCOM'),
+(6, 10, NULL, 10000.00,'income', '2026-09-01','Test income'),
+(6, 1, 1,      300.00,'expense','2026-09-02','Test Swiggy');
+
+INSERT INTO Receipt (transaction_id, file_path) VALUES
+(3,'/receipts/swiggy_0804.pdf'),(9,'/receipts/amazon_headphones.pdf'),(25,'/receipts/amazon_0912.pdf');

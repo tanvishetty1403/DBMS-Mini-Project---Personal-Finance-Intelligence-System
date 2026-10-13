@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block body %}
+<h1>Accounts</h1>
+<div class="grid">
+<div class="card"><div class="mut">Total balance</div><div class="stat">₹{{ '{:,.2f}'.format(total) }}</div></div>
+{% for a in accounts %}<div class="card"><div class="mut">{{ a.account_type|title }}</div><b>{{ a.account_name }}</b>
+<div class="stat">₹{{ '{:,.2f}'.format(a.balance) }}</div></div>{% endfor %}</div>
+<div class="card"><b>Add account</b><br><br>
+<form class="row" method="post">
+<label>Name<input name="account_name" required></label>
+<label>Type<select name="account_type"><option>savings</option><option>cash</option><option>credit</option><option>wallet</option></select></label>
+<label>Opening balance<input name="balance" type="number" step="0.01" min="0" value="0"></label>
+<button>Add</button></form></div>{% endblock %}

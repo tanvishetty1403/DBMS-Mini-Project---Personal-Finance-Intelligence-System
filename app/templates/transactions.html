@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block body %}
+<h1>Transactions</h1>
+<div class="card"><b>Add transaction</b><br><br>
+<form class="row" method="post">
+<label>Account<select name="account_id">{% for a in accounts %}<option value="{{ a.account_id }}">{{ a.account_name }}</option>{% endfor %}</select></label>
+<label>Type<select name="txn_type"><option>expense</option><option>income</option></select></label>
+<label>Category<select name="category_id">{% for c in categories %}<option value="{{ c.category_id }}">{{ c.name }} ({{ c.category_type }})</option>{% endfor %}</select></label>
+<label>Merchant<select name="merchant_id"><option value="">None</option>{% for m in merchants %}<option value="{{ m.merchant_id }}">{{ m.name }}</option>{% endfor %}</select></label>
+<label>Amount<input name="amount" type="number" step="0.01" min="0.01" required></label>
+<label>Date<input name="txn_date" type="date" value="{{ today }}" required></label>
+<label>Description<input name="description"></label>
+<button>Add</button></form></div>
+<div class="card">
+<form class="row" method="get" style="margin-bottom:12px">
+<label>Account<select name="account"><option value="">All</option>{% for a in accounts %}<option value="{{ a.account_id }}" {{ 'selected' if filters.get('account')==a.account_id|string }}>{{ a.account_name }}</option>{% endfor %}</select></label>
+<label>Category<select name="category"><option value="">All</option>{% for c in categories %}<option {{ 'selected' if filters.get('category')==c.name }}>{{ c.name }}</option>{% endfor %}</select></label>
+<label>Month<input name="month" type="month" value="{{ filters.get('month','') }}"></label>
+<button>Filter</button></form>
+<table><tr><th>Date</th><th>Account</th><th>Category</th><th>Merchant</th><th>Description</th><th class="right">Amount</th><th></th></tr>
+{% for t in txns %}<tr><td>{{ t.txn_date }}</td><td>{{ t.account_name }}</td><td>{{ t.category }}</td><td>{{ t.merchant or '-' }}</td><td>{{ t.description or '' }}</td>
+<td class="right {{ 'in' if t.txn_type in ('income','transfer_in') else 'out' }}">{{ '+' if t.txn_type in ('income','transfer_in') else '-' }}₹{{ '{:,.2f}'.format(t.amount) }}</td>
+<td><form method="post" action="{{ url_for('tanvi.delete_transaction', tid=t.transaction_id) }}" onsubmit="return confirm('Delete this transaction?')"><button class="link">Delete</button></form></td></tr>
+{% else %}<tr><td colspan="7" class="mut">No transactions found</td></tr>{% endfor %}</table></div>{% endblock %}

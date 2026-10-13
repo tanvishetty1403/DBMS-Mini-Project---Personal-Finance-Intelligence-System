@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% block body %}
+<h1>Spending analytics</h1>
+<form class="row card" method="get">
+<label>Year<select name="year">{% for y in years %}<option {{ 'selected' if y.y==year }}>{{ y.y }}</option>{% endfor %}</select></label>
+<label>Month<input name="month" type="number" min="1" max="12" value="{{ month }}"></label><button>Apply</button></form>
+<div class="grid">
+<div class="card"><div class="mut">Spent this month</div><div class="stat">₹{{ '{:,.2f}'.format(kpi.spend) }}</div></div>
+<div class="card"><div class="mut">Savings rate</div><div class="stat">{{ kpi.rate }}%</div></div></div>
+<div class="grid">
+<div class="card"><b>By category</b><canvas id="cat"></canvas></div>
+<div class="card"><b>Top merchants</b><canvas id="mer"></canvas></div></div>
+<div class="card"><b>Income vs expense by month</b><canvas id="mon"></canvas></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const q = "year={{ year }}&month={{ month }}";
+fetch("/api/analytics/category?" + q).then(r => r.json()).then(d => new Chart("cat", {type: "doughnut",
+  data: {labels: d.map(x => x.category), datasets: [{data: d.map(x => x.total_spent)}]}}));
+fetch("/api/analytics/merchant").then(r => r.json()).then(d => new Chart("mer", {type: "bar",
+  data: {labels: d.map(x => x.merchant), datasets: [{label: "₹ spent", data: d.map(x => x.total_spent)}]}}));
+fetch("/api/analytics/monthly").then(r => r.json()).then(d => new Chart("mon", {type: "bar",
+  data: {labels: d.map(x => x.ym), datasets: [{label: "Income", data: d.map(x => x.income)}, {label: "Expense", data: d.map(x => x.expense)}]}}));
+</script>{% endblock %}
