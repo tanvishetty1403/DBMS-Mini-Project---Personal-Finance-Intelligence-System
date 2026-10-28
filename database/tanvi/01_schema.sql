@@ -1,4 +1,4 @@
--- Owner: Tanvi B. Shetty | Tables: User, Category, Merchant, Account, Transaction, Receipt
+-- Owner: Tanvi B. Shetty | Tables: User, Category, Merchant, Account, Transaction (receipts live in MongoDB)
 DROP DATABASE IF EXISTS personal_finance;
 CREATE DATABASE personal_finance;
 USE personal_finance;
@@ -51,14 +51,6 @@ CREATE TABLE Transaction (
     CONSTRAINT fk_transaction_merchant FOREIGN KEY (merchant_id) REFERENCES Merchant(merchant_id) ON DELETE SET NULL,
     CONSTRAINT chk_transaction_amount CHECK (amount > 0),
     CONSTRAINT chk_txn_type CHECK (txn_type IN ('income','expense','transfer_in','transfer_out'))
-);
-
-CREATE TABLE Receipt (
-    receipt_id INT AUTO_INCREMENT PRIMARY KEY,
-    transaction_id BIGINT NOT NULL,
-    file_path VARCHAR(500) NOT NULL,
-    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_receipt_transaction FOREIGN KEY (transaction_id) REFERENCES Transaction(transaction_id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_transaction_account  ON Transaction(account_id);

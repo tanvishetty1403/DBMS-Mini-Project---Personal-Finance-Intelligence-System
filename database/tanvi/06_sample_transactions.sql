@@ -32,5 +32,3 @@ INSERT INTO Transaction (account_id, category_id, merchant_id, amount, txn_type,
 (6, 10, NULL, 10000.00,'income', '2026-09-01','Test income'),
 (6, 1, 1,      300.00,'expense','2026-09-02','Test Swiggy');
 
-INSERT INTO Receipt (transaction_id, file_path) VALUES
-(3,'/receipts/swiggy_0804.pdf'),(9,'/receipts/amazon_headphones.pdf'),(25,'/receipts/amazon_0912.pdf');
