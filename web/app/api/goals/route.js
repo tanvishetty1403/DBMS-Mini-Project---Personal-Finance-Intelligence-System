@@ -17,11 +17,15 @@ export async function GET() {
 export async function POST(req) {
   const s = await getSession();
   const b = await req.json();
+  const target = Number(b.target_amount), saved = Number(b.current_amount || 0);
+  if (!(target > 0)) return fail({ message: 'Target must be greater than 0' });
+  if (saved < 0) return fail({ message: 'Already saved cannot be negative' });
+  if (saved >= target) return fail({ message: 'Already saved must be less than the target' });
   try {
     const r = await query(
       'INSERT INTO Goal (user_id, goal_name, target_amount, current_amount, deadline) VALUES (?,?,?,?,?)',
-      [s.uid, b.goal_name, b.target_amount, b.current_amount || 0, b.deadline || null]);
-    audit(s.uid, 'add_goal', 'goal', r.insertId, { goal_name: b.goal_name, target: Number(b.target_amount) });
+      [s.uid, b.goal_name, target, saved, b.deadline || null]);
+    audit(s.uid, 'add_goal', 'goal', r.insertId, { goal_name: b.goal_name, target });
     return ok({ goal_id: r.insertId }, 201);
   } catch (e) { return fail(e); }
 }

@@ -22,6 +22,10 @@ export async function GET() {
 export async function POST(req) {
   const s = await getSession();
   const b = await req.json();
+  // friendly messages first; the database CHECK constraints are the safety net behind them
+  if (!(Number(b.quantity) > 0)) return fail({ message: 'Quantity must be greater than 0' });
+  if (!(Number(b.buy_price) >= 0)) return fail({ message: 'Buy price cannot be negative' });
+  if (b.current_price && !(Number(b.current_price) >= 0)) return fail({ message: 'Current price cannot be negative' });
   try {
     const r = await query(
       `INSERT INTO Investment (user_id, asset_name, asset_type, quantity, buy_price, current_price, purchase_date)

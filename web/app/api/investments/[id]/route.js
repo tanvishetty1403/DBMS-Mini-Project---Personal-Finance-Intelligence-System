@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic';
 export async function PUT(req, { params }) {
   const s = await getSession();
   const b = await req.json();
+  if (!(Number(b.current_price) >= 0)) return fail({ message: 'Enter a valid price (0 or more)' });
   try {
     const r = await query('UPDATE Investment SET current_price=? WHERE investment_id=? AND user_id=?',
       [b.current_price, params.id, s.uid]);
