@@ -4,13 +4,17 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 
-// Maansi: add { href: '/budgets', label: 'Budgets' }, goals, subscriptions, investments, dashboard here
 const LINKS = [
+  { href: '/dashboard', label: 'Dashboard' },
   { href: '/accounts', label: 'Accounts' },
   { href: '/transactions', label: 'Transactions' },
   { href: '/transfer', label: 'Transfer' },
   { href: '/analytics', label: 'Analytics' },
   { href: '/activity', label: 'Activity' },
+  { href: '/budgets', label: 'Budgets' },
+  { href: '/subscriptions', label: 'Subscriptions' },
+  { href: '/goals', label: 'Goals' },
+  { href: '/investments', label: 'Investments' },
 ];
 
 export default function Nav() {
